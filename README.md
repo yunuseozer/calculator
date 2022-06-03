@@ -72,36 +72,60 @@ Renders the text that is shown at teh start of starting the calculator.
 
 This is the full-size chart that is only shown when you want to toggle it. Overlay is presented when viewing it and makes CarbonCalculator unclickable.
 
-#### CalcPages
+#### pages
 
 Holds all the different pages that the CarbonCalculator renders.
 
-#### Custom Assets
+#### customAssets
 
 This holds all the custom UI components such as dropdown menu and slider bars that deviate from their orginal representation
+
+#### svgs
+
+This holds all the several SVG's used throughout the project.
+
+#### components
+
+This holds all other compoents that arent pages, custom assets or the container itself e.g. resultschart
+
 
 ## MISC
 
 ### Outside NPM packages
 
-The only outside dependecies within the project are the tooltip package: https://www.npmjs.com/package/react-tooltip
+The only outside dependecies within the project are the  packages: 
 
-This is used to render the tooltips within the title
+https://www.npmjs.com/package/lodash 
 
-## TO-DO
-
-### Bug Fixes:
-There are a few notable bugs right now in the app. Most notable of which include
+https://www.npmjs.com/package/sass
 
 
-Some UI Components need limits and Syntax shown:
-eg. Vehicles should only be limited to 4 max vehicles.
-Input Fields Shouls have a character limit.
-Input Fields should also check for valid parameters.
+## TO-DO (BUG FIXES)
 
-### I-Frame Wrapper
+### Location Input:
 
-Need to wrap whole app under an Iframe, and have it able to export as so.
+Currently only Zip Code inputs are allowed for the calculator input. To allow for City, State, etc... regex and API parsing needs to be implemented within the front end.
+
+### Form Validation:
+
+A way to ensure that only valid inputs are accepted when users are entering their data.
+
+### Home API discrepency:
+
+The values from the intial API call and subsequent API calls for footprint_housing values differ slighly causing there to be a noticed change without any user input.
+
+### Food Input Bias:
+
+There is a multipiler that isn't being used correctly when Food inputs are being calculated (This might be a realy easy fix that is written in documentation somewhere). Currently the input values are calculated by having default values multiplied by serving size.
+
+### Tooltip for bar charts:
+
+There needs to be a number displayed when a user hovers over barcharts. See figma file for more information.
+
+### API calls :
+
+A bug occurs sometimes where there are too many API calls at the same time causing unpredictable behavior. 
+
 
 ## Available Scripts
 
