@@ -48,12 +48,6 @@ SCSS file for all of Calculator files. File is split up accordingly to section.
 ### Containier.js
 
 Container.js contains the Container Function which renders a React Component that will hold all of the the TNC Calculator global states as well as the API function calls. This Component is IMPORTANT as any react hooks that change the global state should be passed downstream from here.
-For instance:
-`const [inputSize, setInputSize] = useState("3");`
-Sets a react hook `inputSize` and it's function to change it as `setInputSize` with a default value of 3. 
-`inputSize` is a value that will be passed into the API function call, and shouldn't have to be referenced anywhere else. 
-`setInputSize` on the other hand should be passed downstream to the Carbon Calculator and later on to the corrosponding Page, which in this case is Started.js
-Any change of InputSize will now be refelcted in the global state despite the change occuring in a child, and have the correct API parameters called when we want updated results.
 
 
 #### CarbonCalculator.js
@@ -88,8 +82,22 @@ This holds all the several SVG's used throughout the project.
 
 This holds all other compoents that arent pages, custom assets or the container itself e.g. resultschart
 
+## Data Flow
 
-## MISC
+The crux of the website works by having 3 objects stored in container.js. An Input Object, A Result Object, and a Baseline Object:
+Input Object: This is the object that is always passed to the API call and is never modified directly. We change it in the following manner:
+1: We pass down the input object to each of the Calculator pages. 
+2: Each Calculator page creates a local copy of the input object and modifies it in accordance to user input
+3: Once the user is done working on a local page,(By moving to a new page) We set the old input object in the container.js file to now point to the new modified local copy.
+4: A hook in container.js is set to call to the API anytime the input object is changed so anytime we switch calc pages we API call. 
+
+Result Object: This is the object that stores whatever the most recent API call returned.
+
+Baseline Object: The first Result Object that the API call returned to compare against subsequent API calls.
+
+
+
+## Misc
 
 ### Outside NPM packages
 
