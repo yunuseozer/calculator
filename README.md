@@ -141,6 +141,14 @@ There needs to be a number displayed when a user hovers over barcharts. See figm
 
 A bug occurs sometimes where there are too many API calls at the same time causing unpredictable behavior. 
 
+### Social Media Templates :
+
+The social media links currently are only filled out to tweet out "Hello World". This needs to be edited.
+
+### Cool Climate Pledge :
+
+The Cool Climate Pledge API still needs to be implemented.
+
 
 ## Available Scripts
 
