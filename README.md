@@ -85,15 +85,24 @@ This holds all other compoents that arent pages, custom assets or the container 
 ## Data Flow
 
 The crux of the website works by having 3 objects stored in container.js. An Input Object, A Result Object, and a Baseline Object:
-Input Object: This is the object that is always passed to the API call and is never modified directly. We change it in the following manner:
-1: We pass down the input object to each of the Calculator pages. 
-2: Each Calculator page creates a local copy of the input object and modifies it in accordance to user input
-3: Once the user is done working on a local page,(By moving to a new page) We set the old input object in the container.js file to now point to the new modified local copy.
-4: A hook in container.js is set to call to the API anytime the input object is changed so anytime we switch calc pages we API call. 
 
-Result Object: This is the object that stores whatever the most recent API call returned.
+#### Input Object:
 
-Baseline Object: The first Result Object that the API call returned to compare against subsequent API calls.
+This is the object that is always passed to the API call and is never modified directly. We change it in the following manner:
+\begin{enumerate}
+\item We pass down the input object to each of the Calculator pages. 
+\item Each Calculator page creates a local copy of the input object and modifies it in accordance to user input
+\item Once the user is done working on a local page,(By moving to a new page) We set the old input object in the container.js file to now point to the new modified local copy.
+\item A hook in container.js is set to call to the API anytime the input object is changed so anytime we switch calc pages we API call. 
+\end{enumerate}
+
+#### Result Object:
+
+This is the object that stores whatever the most recent API call returned.
+
+#### Baseline Object:
+
+The first Result Object that the API call returned to compare against subsequent API calls.
 
 
 
