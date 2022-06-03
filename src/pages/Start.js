@@ -104,14 +104,6 @@ const Start = ({nextPage, setinputObject, input}) => {
             <h1>Get Started</h1>
             <p>Start by telling us about your household. We'll use this to fill in the calculator with some assumptions about your footprint. You can adjust as you go to see how you compare.</p>
             <h3>Where do you live?</h3>
-            {/* <LocationAutocomplete
-              className="text-input"
-              googleAPIKey="AIzaSyCoRUrrbKw_g7wg7PnU-UOtoin0EYEihKQ"
-              onChange={e => changeLocation(e.target.value)}
-              placeholder = "Enter City or Zip Code" 
-              onDropdownSelect={e => changeLocation(e.input.value)}
-              componentRestrictions={{country : ['USA']}}
-            ></LocationAutocomplete> */}
             <input className="text-input" 
             value={location}
             onInput={e => changeLocation(e.target.value)} 
