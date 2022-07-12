@@ -9,6 +9,7 @@ import CarbCacl from './components/CarbonCalculator';
 
 
 
+let baseline_ready = false
 
 
 //Container.js is the catch all for the codebase. This is where we commuincate with the API and set the pages of the calculator/ The Results offset.
@@ -21,7 +22,8 @@ function Container() {
   //////////////////////////////////////////
 
     const defaultval= 1
- 
+
+
 
     const [page, setPage] = useState(0); // page is integer corresponding to page on calculator widget. eg 0=starting, 1=travel...etc
     const [graphDisplay, setGraphDisplay] = useState(false); //graphdisplay is a toggle to display overlay for results. false = NotDISPLAYED.
@@ -39,7 +41,7 @@ function Container() {
         input_footprint_transportation_num_vehicles: defaultval,
         input_footprint_transportation_miles1: defaultval,
         input_footprint_transportation_mpg1: defaultval,
-        input_footprint_transportation_fuel1: defaultval,
+        input_footprint_transportation_fuel1: 2,
         input_footprint_transportation_miles2: defaultval,
         input_footprint_transportation_mpg2: defaultval,
         input_footprint_transportation_fuel2: defaultval,
@@ -148,6 +150,8 @@ function Container() {
     const [inputObject, setinputObject] = useState(input); 
     const [resultObject, setresultObject] = useState({}); 
     const [baselineObject, setbaselineObject] = useState({}); 
+    const [defaultObject, setdefaultObject] = useState({}); 
+
 
 
     // When inputObject is changed, update the API 
@@ -224,6 +228,7 @@ function Container() {
         if (Object.keys(baselineObject).length === 0) {  
           console.log(inputObject)
             let APICaller = new APILib.GET_DEFAULTS_AND_RESULTS_API();
+            console.log(inputObject['input_size'])
             APICaller.callAPI({
                 input_location_mode: inputObject['input_location_mode'],
                 input_income: inputObject['input_income'],
@@ -231,22 +236,32 @@ function Container() {
                 input_size: inputObject['input_size']
             }).then((returnVal) => {
                 console.log(returnVal)
-                setresultObject(returnVal)
+                //setresultObject(returnVal)
                 setbaselineObject(returnVal)
+                setdefaultObject(returnVal)
+                console.log(defaultObject)
                 let newinputobject = JSON.parse(JSON.stringify(inputObject))
                 for (const property in returnVal) {
                     if (property in newinputobject){
                         newinputobject[property] = returnVal[property]
                     }
                 }
+
                 setinputObject(newinputobject)
             });
         } else if( page !== 0) {
             console.log(inputObject)
             let footprintAPICaller = new APILib.COMPUTE_FOOTPRINT_API();
             footprintAPICaller.callAPI(inputObject).then((returnVal) => {
+                console.log(returnVal)
+
+                if (!baseline_ready) {
+                  setbaselineObject(returnVal)
+                  baseline_ready = true
+                }
                 setresultObject(returnVal)
             });
+            
         }
     return true
   }
@@ -264,12 +279,12 @@ function Container() {
         </div>
       </div>
       <div className="carb-calc" id={findWidth(page)}>
-        <CarbCacl APIgrab={APIgrab} page={page} nextPage={nextPage} prevPage={prevPage} selectPage={selectPage} toggleGraph={toggleGraph} setinputObject={setinputObject} input={inputObject} baseline={baselineObject} results={resultObject}> 
+        <CarbCacl APIgrab={APIgrab} page={page} nextPage={nextPage} prevPage={prevPage} selectPage={selectPage} toggleGraph={toggleGraph} setinputObject={setinputObject} input={inputObject} baseline={baselineObject} results={resultObject} defaultObject={defaultObject}> 
         </CarbCacl>
       </div>
       <Intro page={page}></Intro> 
       <div className = "rightgraph-transition desktop" id={page !== 0 && page !== 5 ?  "" : "blank-display"}>
-        <CCGraph toggleGraph={toggleGraph} baseline={baselineObject} results={resultObject} ></CCGraph>
+        <CCGraph toggleGraph={toggleGraph} baseline={baselineObject} results={resultObject} baseline_ready={baseline_ready}></CCGraph>
       </div>
 
     </div>

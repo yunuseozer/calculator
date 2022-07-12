@@ -546,6 +546,39 @@ justify-content: space-around;
   .results-page-graph:hover{
     transform: scale(1.1, 1.1);
   }
+
+  .results-page-graph::before{
+    content: attr(data-tip);
+    font-family: arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    position: absolute;
+    z-index: 999;
+    border-color: #000000;
+    border: #000000;
+    border-style: groove;
+    border-width: 0.7px;
+    white-space: nowrap;
+    bottom: 9999px;
+    background: #ffffff;
+    color: #000000;
+    padding: 7px;
+    line-height: 24px;
+    height: 24px;
+    width: 100px;
+    top: 80px;
+    right: -20px;
+    opacity: 0;
+    -webkit-transition: opacity 0.4s ease-out;
+    -moz-transition: opacity 0.4s ease-out;
+    -o-transition: opacity 0.4s ease-out;
+    transition: opacity 0.4s ease-out;
+    text-shadow: none;
+  }
+  .results-page-graph:hover::before{
+    opacity: 1;
+  }
+
   h3{
     font-size: 13px;
     font-weight: 700;

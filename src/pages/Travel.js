@@ -4,13 +4,11 @@ import trashicon from '../svgs/trash-347.svg';
 import _ from "lodash";
 
 
-const Travel = ({setinputObject, input}) => {
+const Travel = ({setinputObject, input, baseline, defaultObject}) => {
 
   const [animation, setAnimation] = useState("animation");
   const [vehicles, setVehicles] = useState([0]);
   const [count, setCount] = useState(1);
-
-
   const [newinputobject, setnewinputobject] = useState({...input}); 
 
 
@@ -46,7 +44,7 @@ const Travel = ({setinputObject, input}) => {
         <div className="travel-wrapper" id = {animation}>
           <h2>How do you get around?</h2>
           <h5 className="vehicle-sub-text">YOUR VEHICLES</h5>
-          {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setinputObject={setinputObject}></Vehicle>)}
+          {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setinputObject={setinputObject} baseline={baseline} defaultObject={defaultObject}></Vehicle>)}
           <button className="alternate-button" onClick={()=>addVehicle()}>+ ADD ANOTHER VEHICLE</button>
           <Plane newinputobject={newinputobject} setinputObject={setinputObject}></Plane>
           <p className="info-text">Note: Public transportation (e.g., bus, train) is assumed average for all users since its relative impact is small. </p>
@@ -58,12 +56,26 @@ const Travel = ({setinputObject, input}) => {
 export default Travel;
 
 
-function Vehicle ({index, removeVehicle, newinputobject, setinputObject}) {
-
+function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baseline, defaultObject, miles_default}) {
   const [gas, setGas] = useState(undefined)
   const [freq, setFreq] = useState(undefined)
   const [miles, setMiles] = useState('')
   const [mpg, setMpg] = useState('')
+
+
+  const mpg_default = defaultObject['input_footprint_transportation_mpg1']
+
+
+
+  if (freq == "PER MONTH"){
+      miles_default = Math.round(miles_default / 12)
+  }
+  if (freq == "PER WEEK"){
+      miles_default = Math.round(miles_default / 52)
+  }
+                        
+
+
 
   function changeType(param, newvalue) {
       setGas(newvalue)
@@ -124,6 +136,7 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject}) {
             type="number" 
             id="mpg" 
             onWheel={(e) => e.target.blur()}
+            placeholder={mpg_default}
             name="mpg"
             value={mpg}
             onChange={e => changeMPG("input_footprint_transportation_mpg" + String(index + 1), e.target.value)}
@@ -135,6 +148,7 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject}) {
               className="text-input" 
               type="number" 
               onWheel={(e) => e.target.blur()}
+              placeholder={miles_default}
               id="md" 
               name="md"
               value={miles}

@@ -10,7 +10,7 @@ import Results from '../pages/Results';
 
 //Carbon Calculator Wrappper to render different pages and handle page changes
 //Also in charge of updating API Call whenever next button is clicked or navbar is clicked
-const CarbCacl = ({APIgrab, page, prevPage, nextPage, selectPage, toggleGraph, setinputObject, baseline, input, results}) => {
+const CarbCacl = ({APIgrab, page, prevPage, nextPage, selectPage, toggleGraph, setinputObject, baseline, input, results, defaultObject}) => {
 
 
   //////////////////////////////////////////
@@ -40,7 +40,7 @@ const CarbCacl = ({APIgrab, page, prevPage, nextPage, selectPage, toggleGraph, s
     //Pages to render based on index 
     const pages = [
     <Start APIgrab={APIgrab} nextPage={nextPage} setinputObject={setinputObject} input={input}></Start>,
-    <Travel  setinputObject={setinputObject} input={input}></Travel>, 
+    <Travel  setinputObject={setinputObject} input={input} baseline={baseline} defaultObject={defaultObject}></Travel>, 
     <Home setinputObject={setinputObject} input={input}></Home>, 
     <Food setinputObject={setinputObject} input={input}></Food>, 
     <Shopping setinputObject={setinputObject} input={input}></Shopping>, 

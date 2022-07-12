@@ -77,7 +77,7 @@ return(
       {/* <ReactTooltip /> */}
           <div  className="results-page-graph light-blue" data-tip={Number(clientperc).toFixed(2) + " tons CO2"}  style={{height: clheight}} >
           </div>
-          <div className="results-page-graph light-grey" data-tip={" tons CO2"} style={{height: otheight}} onMouseOut={()=>console.log('oj')}>
+          <div className="results-page-graph light-grey" data-tip={Number(otherperc).toFixed(2) + " tons CO2"} style={{height: otheight}} onMouseOut={()=>console.log('oj')}>
           </div>
       </div>
       <h3>{title}</h3>

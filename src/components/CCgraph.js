@@ -1,7 +1,7 @@
 //REACT COMPONENT FOR RIGHT GRAPH DISPLAY DURING UI RENDER
 
 
-const CCGraph = ({toggleGraph, baseline, results}) => {
+const CCGraph = ({toggleGraph, baseline, results, baseline_ready}) => {
 
 
 
@@ -16,57 +16,63 @@ const CCGraph = ({toggleGraph, baseline, results}) => {
   
     //----grandTotal----
     //grandTotal Carbon Footprint number from API call in container.js.
-
-
-
-    let baselineTotal = baseline['result_grand_total'] ? Math.round(baseline['result_grand_total']) : 0
-    let grandTotal = results['result_grand_total'] ? Math.round(results['result_grand_total']) : 0
-
-
-
-    
-    function findpercent(final, starting){
-      return Math.abs(Math.round(((final - starting) / Math.abs(starting)) * 100))
-    }
-  
-    function stringdisplay(final, starting){
-      if (final <= starting) {
-        return String(findpercent(final, starting)) + "% better"
+      let baselineTotal, grandTotal
+      if (!baseline_ready) {
+        baselineTotal = 0
+        grandTotal = 0
       } else {
-        return String(findpercent(final, starting)) + "% worse"
+        baselineTotal = baseline['result_grand_total'] ? Math.round(baseline['result_grand_total']*100)/100 : 0
+        grandTotal = results['result_grand_total'] ? Math.round(results['result_grand_total']*100)/100 : 0
       }
+
+      console.log(baseline['result_grand_total'])
+      console.log(results['result_grand_total'])
+
+
+      
+      function findpercent(final, starting){
+        return Math.abs(Math.round(((final - starting) / Math.abs(starting)) * 100))
+      }
+    
+      function stringdisplay(final, starting){
+        if (final <= starting) {
+          return String(findpercent(final, starting)) + "% better"
+        } else {
+          return String(findpercent(final, starting)) + "% worse"
+        }
+      }
+    
+      return (
+          <div className="ccGraph">
+            {grandTotal === baselineTotal ? <h3>To start, we use your household location, size and income to estimate your average carbon footprint.</h3> : <h3>So far your footprint is <b> {stringdisplay(grandTotal, baselineTotal)}</b> than average</h3> }
+            <div className="desktop">
+              <div className="row-wrapper graph-row">
+                <SmallGraph type = {1} size = {Math.round(grandTotal)} mobile={false}></SmallGraph>
+                <SmallGraph type = {0} size = {Math.round(baselineTotal)} mobile={false}></SmallGraph>
+              </div>
+              <p id="moredetails" className="link" onClick={()=>toggleGraph()}>View more details</p>
+              <hr></hr>
+              <p>Learn how you can <b className="link">take action </b></p> 
+              <hr></hr>
+            </div>
+            <div className="mobile">
+              <div className="col-wrapper graph-row">
+                <SmallGraph type = {1} baseline={baselineTotal} size = {grandTotal} mobile={true}></SmallGraph>
+                <SmallGraph type = {0} baseline={baselineTotal} size = {baselineTotal} mobile={true}></SmallGraph>
+              </div>
+              <p className="link" onClick={()=>toggleGraph()}>View more details</p>
+              <section className="desktop">
+                <hr></hr>
+                <p id="takeaction">Learn how you can <b className="link">take action </b></p> 
+                <hr></hr>
+              </section>
+            </div>
+          </div>
+          
+      );
+  
     }
-  
-    return (
-        <div className="ccGraph">
-          {grandTotal === baselineTotal ? <h3>To start, we use your household location, size and income to estimate your average carbon footprint.</h3> : <h3>So far your footprint is <b> {stringdisplay(grandTotal, baselineTotal)}</b> than average</h3> }
-          <div className="desktop">
-            <div className="row-wrapper graph-row">
-              <SmallGraph type = {1} size = {grandTotal} mobile={false}></SmallGraph>
-              <SmallGraph type = {0} size = {baselineTotal} mobile={false}></SmallGraph>
-            </div>
-            <p id="moredetails" className="link" onClick={()=>toggleGraph()}>View more details</p>
-            <hr></hr>
-            <p>Learn how you can <b className="link">take action </b></p> 
-            <hr></hr>
-          </div>
-          <div className="mobile">
-            <div className="col-wrapper graph-row">
-              <SmallGraph type = {1} baseline={baselineTotal} size = {grandTotal} mobile={true}></SmallGraph>
-              <SmallGraph type = {0} baseline={baselineTotal} size = {baselineTotal} mobile={true}></SmallGraph>
-            </div>
-            <p className="link" onClick={()=>toggleGraph()}>View more details</p>
-            <section className="desktop">
-              <hr></hr>
-              <p id="takeaction">Learn how you can <b className="link">take action </b></p> 
-              <hr></hr>
-            </section>
-          </div>
-        </div>
-        
-    );
-  }
-  
+    
   export default CCGraph
   
   
@@ -121,4 +127,5 @@ const CCGraph = ({toggleGraph, baseline, results}) => {
         </div>
       )
     }
+  
   }
