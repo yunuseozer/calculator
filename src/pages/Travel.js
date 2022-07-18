@@ -12,6 +12,22 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
   const [newinputobject, setnewinputobject] = useState({...input}); 
 
 
+  let num_vehicles_default = 0;
+
+  for (let i = 1; i <= 10; i++) {
+    let query = "input_footprint_transportation_miles" + i;
+    //console.log(query)
+    if (defaultObject[query] == 0) {
+      num_vehicles_default = i - 1;
+      break;
+    }    
+  }
+  //console.log(num_vehicles_default)
+
+
+
+  const keys = [...Array(num_vehicles_default).keys()];
+
   useEffect(() => {
     return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
   }, []);
@@ -22,6 +38,14 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
         setAnimation("animation-2")
       }, delayInMilliseconds);    }
    , [animation]);
+
+   useEffect(() => {
+    if (count == 1 && num_vehicles_default != 1) {
+      const a = [...Array(Math.max(num_vehicles_default, count)).keys()];
+      setVehicles(a)
+      setCount(Math.max(num_vehicles_default, count))
+    }
+   }, [vehicles, count])
 
 
 
@@ -44,7 +68,8 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
         <div className="travel-wrapper" id = {animation}>
           <h2>How do you get around?</h2>
           <h5 className="vehicle-sub-text">YOUR VEHICLES</h5>
-          {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setinputObject={setinputObject} baseline={baseline} defaultObject={defaultObject}></Vehicle>)}
+          
+              {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setinputObject={setinputObject} baseline={baseline} defaultObject={defaultObject}></Vehicle>)}
           <button className="alternate-button" onClick={()=>addVehicle()}>+ ADD ANOTHER VEHICLE</button>
           <Plane newinputobject={newinputobject} setinputObject={setinputObject}></Plane>
           <p className="info-text">Note: Public transportation (e.g., bus, train) is assumed average for all users since its relative impact is small. </p>
@@ -56,7 +81,7 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
 export default Travel;
 
 
-function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baseline, defaultObject, miles_default}) {
+function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baseline, defaultObject}) {
   const [gas, setGas] = useState(undefined)
   const [freq, setFreq] = useState(undefined)
   const [miles, setMiles] = useState('')
@@ -64,6 +89,17 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baselin
 
 
   const mpg_default = defaultObject['input_footprint_transportation_mpg1']
+
+  let miles_default =   index == 0 ? defaultObject['input_footprint_transportation_miles1']:
+                        index == 1 ? defaultObject['input_footprint_transportation_miles2']:
+                        index == 2 ? defaultObject['input_footprint_transportation_miles3']:
+                        index == 3 ? defaultObject['input_footprint_transportation_miles4']:
+                        index == 4 ? defaultObject['input_footprint_transportation_miles5']:
+                        index == 5 ? defaultObject['input_footprint_transportation_miles6']:
+                        index == 6 ? defaultObject['input_footprint_transportation_miles7']:
+                        index == 7 ? defaultObject['input_footprint_transportation_miles8']:
+                        index == 8 ? defaultObject['input_footprint_transportation_miles9']:
+                        index == 9 ? defaultObject['input_footprint_transportation_miles10']: 0
 
 
 

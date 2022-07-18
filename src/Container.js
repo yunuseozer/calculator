@@ -240,6 +240,7 @@ function Container() {
                 setbaselineObject(returnVal)
                 setdefaultObject(returnVal)
                 console.log(defaultObject)
+                console.log(baselineObject)
                 let newinputobject = JSON.parse(JSON.stringify(inputObject))
                 for (const property in returnVal) {
                     if (property in newinputobject){
