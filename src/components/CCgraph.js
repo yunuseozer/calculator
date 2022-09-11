@@ -25,8 +25,8 @@ const CCGraph = ({toggleGraph, baseline, results, baseline_ready}) => {
         grandTotal = results['result_grand_total'] ? Math.round(results['result_grand_total']*100)/100 : 0
       }
 
-      console.log(baseline['result_grand_total'])
-      console.log(results['result_grand_total'])
+     // console.log(baseline['result_grand_total'])
+     // console.log(results['result_grand_total'])
 
 
       
@@ -123,7 +123,7 @@ const CCGraph = ({toggleGraph, baseline, results, baseline_ready}) => {
           <p>{type ? "Your household" : "Similar Households"} </p>
           <h4 id="special-size">{size}</h4>
           <h4>TONS</h4>
-          <h4>CO2EQ/YEAR</h4>
+          <h3>CO2EQ/YEAR</h3>
         </div>
       )
     }
