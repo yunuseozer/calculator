@@ -1,26 +1,29 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Slider from "../customAssets/Slider";
 import Tooltip from '../customAssets/Tooltip';
 import _ from "lodash";
 
 
-const Food = ({setinputObject, input}) => {
+const Food = ({APIgrab, setinputObject, input}) => {
 
-
+  
   const [animation, setAnimation] = useState("animation");
   const [dairy, setDairy] = useState(0);
+  const [r, setR] = useState(0);
   const [meat, setMeat] = useState(0);
   const [fish, setFish] = useState(0);
   const [other, setOther] = useState(0);
   const [poultry, setPoultry] = useState(0);
   const [grains, setGrains] = useState(0);
+  const [yscroll, setYscroll] = useState(0);
   const [fruits, setFruits] = useState(0);
   const [drinks, setDrinks] = useState(0);
-
   const [newinputobject, setnewinputobject] = useState({...input}); 
+  //console.log(newinputobject)
 
-
-
+  useEffect(() => {
+    return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
+  }, []);
 
   useEffect(() => {
     var delayInMilliseconds = 100; //1 second
@@ -32,47 +35,23 @@ const Food = ({setinputObject, input}) => {
   }
  , [animation]);
 
-
-    useEffect(() => {
-        return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
-    }, []);
+  useLayoutEffect(() => {
+    window.scrollTo(0, yscroll);
+  });
 
     
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_fruitvegetables"] = fruits * (542 / 2.4)
-    }, [fruits]);
 
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_meat_fish"] = fish * (146 / 0.3)
-    }, [fish]);
+    
 
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_meat_poultry"] = poultry * (330 / 0.6)
-    }, [poultry]);
-
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_meat_beefpork"] = meat * (494 / 0.9)
-    }, [meat]);
-
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_meat_other"] = other * (116 / 0.2)
-    }, [other]);
-
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_dairy"] = dairy * (572 / 2.4)
-    }, [dairy]);
-
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_cereals"] = grains * (1338 / 4.4)
-    }, [grains]);
-
-    useEffect(() => {
-        newinputobject["input_footprint_shopping_food_otherfood"] = drinks * (1472 / 1.5)
-    }, [drinks]);
-
-
-
-
+    function changeMeat(param, newval) {
+        newinputobject[param] = Math.round(newval * (494 / 0.9))
+        newinputobject["input_changed"] = 1
+        newinputobject["input_footprint_shopping_food_meattype"] = 1
+        
+        setinputObject(newinputobject)
+        setYscroll(window.scrollY)
+        APIgrab()
+    }
 
       return (
         <div className="travel-wrapper" id = {animation}>
@@ -86,7 +65,8 @@ const Food = ({setinputObject, input}) => {
             avg={0.9}
             title={"BEEF, PORK, LAMB, VEAL"}
             setval={setMeat}
-            val = {meat}
+            val = {Math.round(meat)}
+            onChange = {m => changeMeat("input_footprint_shopping_food_meat_beefpork", m)}
           ></Slider>
           <hr></hr>
           <Slider

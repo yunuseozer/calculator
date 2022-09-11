@@ -16,6 +16,7 @@ const Shopping = ({setinputObject, input}) => {
   useEffect(() => {
     return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
   }, []);
+  console.log(input)
 
   useEffect(() => {
     if (!shopToggle){

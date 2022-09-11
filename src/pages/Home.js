@@ -7,7 +7,7 @@ import _ from "lodash";
 
 
 
-const Home = ({setinputObject, input}) => {
+const Home = ({setinputObject, input, APIgrab, defaultObject}) => {
 
 
   const [animation, setAnimation] = useState("animation");
@@ -17,7 +17,7 @@ const Home = ({setinputObject, input}) => {
 
 
   useEffect(() => {
-    return () => _.isEqual(input, newinputobject) ? null : console.log('heu')
+    return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
   }, []);
 
   useEffect(() => {
@@ -40,13 +40,19 @@ const Home = ({setinputObject, input}) => {
     }, delayInMilliseconds);    }
  , [animation]);
 
-    
+
+ function setInputNew() {
+    setinputObject(newinputobject);
+    //setYscroll(window.scrollY)
+    APIgrab()
+}
+
     return (
       <div id={animation}>
         <div style={{display:'flex', justifyContent:'center', width:'100%', height:'120px'}}>
          <Switch toggler={setHomeToggle} toggle={homeToggle}></Switch>  
          </div>
-         {homeToggle ? <HomeSimple setinputObject={setinputObject} newinputobject={newinputobject}></HomeSimple> : <HomeAdvanced setinputObject={setinputObject} newinputobject={newinputobject}></HomeAdvanced>}     
+         {homeToggle ? <HomeSimple setinputObject={setinputObject} newinputobject={newinputobject} setInputNew={setInputNew} defaultObject={defaultObject}></HomeSimple> : <HomeAdvanced setinputObject={setinputObject} newinputobject={newinputobject}></HomeAdvanced>}     
        </div>
     );
 }
@@ -56,40 +62,48 @@ export default Home;
 
 
 
-function HomeSimple({setinputObject, newinputobject}) {
+function HomeSimple({setinputObject, newinputobject, setInputNew, defaultObject}) {
 
-  const [freq1, setfreq1] = useState("")
+  const [freq1, setfreq1] = useState("$/YEAR")
   const [water1, setWater1] = useState("")
-
+  
   function changeElec(newval) {
-    if (freq1 !== "PER YEAR" && typeof freq1 !== ''){
+    if (freq1 !== "$/YEAR" && typeof freq1 !== ''){
       newinputobject['input_footprint_housing_electricity_dollars'] = newval * freq1
+      console.log(0)
     } else {
       newinputobject['input_footprint_housing_electricity_dollars'] = newval 
+      console.log(1)
     }
+    console.log(freq1)
+    setInputNew()
   }
 
   function changeSpace(newval) {
     newinputobject['input_footprint_housing_squarefeet'] = newval
+    setInputNew()
   }
 
   function changeWater(newval) {
     setWater1(newval)
     newinputobject['input_footprint_housing_watersewage'] = newval
+    setInputNew()
   }
 
   function changeFreq(newval) {
     setfreq1(newval)
+    console.log(newval)
     let curr = newinputobject['input_footprint_housing_electricity_dollars']
-    if (newval == "PER MONTH"){
+    if (newval == "$/MONTH"){
         newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
     }
-    if (newval == "PER WEEK"){
+    if (newval == "$/WEEK"){
         newinputobject['input_footprint_housing_electricity_dollars'] = curr * 52
     }
     if (newval == "PER DAY"){
         newinputobject['input_footprint_housing_electricity_dollars'] = curr * 365
     }
+    setInputNew()
   }
 
 
@@ -105,13 +119,13 @@ function HomeSimple({setinputObject, newinputobject}) {
       <div className="row-wrapper">
         <div className="left-home-input">
           <p>Amount</p>
-          <input className="text-input" placeholder = "1070" type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
+          <input className="text-input" placeholder = {defaultObject["input_footprint_housing_electricity_dollars"]} type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
         </div>
         <div className="right-home-input">
           <p>Frequency</p>
           <Dropdown
             placeholder={"$/YEAR"} 
-            options={["$/YEAR", "$/MONTH", "$/WEEK", "$/DAY"]}
+            options={["$/YEAR", "$/MONTH", "$/WEEK"]}
             value={freq1}
             onChange={u => changeFreq(u)}>
           </Dropdown>
@@ -146,7 +160,7 @@ function HomeSimple({setinputObject, newinputobject}) {
       <div className="row-wrapper">
         <div className="left-home-input">
         <p>Total Square Footage</p>
-        <input className="text-input" placeholder = "1850" type="number" id="fname" name="fname" onChange={e => changeSpace(e.target.value)} onWheel={(e) => e.target.blur()}/>
+        <input className="text-input" placeholder = {defaultObject["input_footprint_housing_squarefeet"]} type="number" id="fname" name="fname" onChange={e => changeSpace(e.target.value)} onWheel={(e) => e.target.blur()}/>
         </div>
       </div>
     </div>
