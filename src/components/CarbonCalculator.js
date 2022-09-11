@@ -36,13 +36,13 @@ const CarbCacl = ({APIgrab, page, prevPage, nextPage, selectPage, toggleGraph, s
   //----funcs----
   //Functions to update container.js API Input states passed on to Carbon Calculator Pages.
 
-
+    //console.log(input)
     //Pages to render based on index 
     const pages = [
     <Start APIgrab={APIgrab} nextPage={nextPage} setinputObject={setinputObject} input={input}></Start>,
-    <Travel  setinputObject={setinputObject} input={input} baseline={baseline} defaultObject={defaultObject}></Travel>, 
-    <Home setinputObject={setinputObject} input={input}></Home>, 
-    <Food setinputObject={setinputObject} input={input}></Food>, 
+    <Travel APIgrab={APIgrab} setinputObject={setinputObject} input={input} baseline={baseline} defaultObject={defaultObject}></Travel>, 
+    <Home setinputObject={setinputObject} input={input} APIgrab={APIgrab} defaultObject={defaultObject}></Home>, 
+    <Food APIgrab={APIgrab} setinputObject={setinputObject} input={input}></Food>, 
     <Shopping setinputObject={setinputObject} input={input}></Shopping>, 
     <Results baseline={baseline} results={results} ></Results>
     ]

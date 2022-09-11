@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Dropdown from '../customAssets/Dropdown';
 import trashicon from '../svgs/trash-347.svg';
 import _ from "lodash";
 
 
-const Travel = ({setinputObject, input, baseline, defaultObject}) => {
+const Travel = ({APIgrab, setinputObject, input, baseline, defaultObject}) => {
 
   const [animation, setAnimation] = useState("animation");
   const [vehicles, setVehicles] = useState([0]);
   const [count, setCount] = useState(1);
   const [newinputobject, setnewinputobject] = useState({...input}); 
+  const [yscroll, setYscroll] = useState(0);
 
 
   let num_vehicles_default = 0;
@@ -24,14 +25,25 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
   }
   //console.log(num_vehicles_default)
 
-
-
-  const keys = [...Array(num_vehicles_default).keys()];
-
-  useEffect(() => {
+ /* useEffect(() => {
+    APIgrab()
     return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
-  }, []);
+    
+  }, []);*/
+
+  function setInputNew() {
+    setinputObject(newinputobject);
+    setYscroll(window.scrollY)
+    APIgrab()
+  }
   
+  
+  useEffect(() => {
+    setInputNew()
+  }, []);
+  console.log(input)
+
+
   useEffect(() => {
       var delayInMilliseconds = 100; //1 second
       setTimeout(function() {
@@ -45,14 +57,17 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
       setVehicles(a)
       setCount(Math.max(num_vehicles_default, count))
     }
-   }, [vehicles, count])
+   }, [vehicles, count]);
 
-
+   useLayoutEffect(() => {
+    window.scrollTo(0, yscroll);
+  });
 
   function addVehicle() {
     setVehicles([...vehicles, String(count)])
     setCount(count + 1)
     newinputobject['input_footprint_transportation_num_vehicles'] = count + 1;
+    setInputNew()
   }
 
   function removeVehicle(index) {
@@ -61,6 +76,7 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
     setVehicles(newVehicles);
     setCount(count - 1)
     newinputobject['input_footprint_transportation_num_vehicles'] = count - 1;
+    setInputNew()
   }
 
     
@@ -69,9 +85,9 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
           <h2>How do you get around?</h2>
           <h5 className="vehicle-sub-text">YOUR VEHICLES</h5>
           
-              {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setinputObject={setinputObject} baseline={baseline} defaultObject={defaultObject}></Vehicle>)}
+              {vehicles.map((item, index) => <Vehicle key={item} index={index} removeVehicle={removeVehicle} newinputobject={newinputobject} setInputNew={setInputNew} baseline={baseline} defaultObject={defaultObject}></Vehicle>)}
           <button className="alternate-button" onClick={()=>addVehicle()}>+ ADD ANOTHER VEHICLE</button>
-          <Plane newinputobject={newinputobject} setinputObject={setinputObject}></Plane>
+          <Plane defaultObject={defaultObject} newinputobject={newinputobject} setinputObject={setinputObject} setInputNew={setInputNew}></Plane>
           <p className="info-text">Note: Public transportation (e.g., bus, train) is assumed average for all users since its relative impact is small. </p>
         </div>
       );
@@ -81,10 +97,10 @@ const Travel = ({setinputObject, input, baseline, defaultObject}) => {
 export default Travel;
 
 
-function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baseline, defaultObject}) {
+function Vehicle ({index, removeVehicle, newinputobject, setInputNew, baseline, defaultObject}) {
   const [gas, setGas] = useState(undefined)
   const [freq, setFreq] = useState(undefined)
-  const [miles, setMiles] = useState('')
+  const [miles, setMiles] = useState(defaultObject["input_footprint_transportation_miles1"])
   const [mpg, setMpg] = useState('')
 
 
@@ -111,20 +127,25 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baselin
   }
                         
 
+ 
 
-
-  function changeType(param, newvalue) {
+  function changeType(param, newvalue, index) {
       setGas(newvalue)
       if (newvalue == "GAS"){
         newinputobject[param] = 1
+        newinputobject["input_footprint_transportation_miles" + String(index + 1)] = miles
       } else{
         newinputobject[param] = 2
+        newinputobject["input_footprint_transportation_miles" + String(index + 1)] = 0
       }
+      setInputNew()
+
   }
 
   function changeMPG(param, newval) {
     setMpg(newval)
     newinputobject[param] = newval
+    setInputNew()
   }
 
   function changeMiles(param, newval) {
@@ -134,6 +155,7 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baselin
     } else {
       newinputobject[param] = newval 
     }
+    setInputNew()
   }
 
   function changeFreq(param, newval) {
@@ -163,7 +185,7 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baselin
           placeholder={"GAS"} 
           options={["GAS", "ELECTRIC"]}
           value={gas}
-          onChange={g => changeType("input_footprint_transportation_fuel" + String(index + 1), g)}
+          onChange={g => changeType("input_footprint_transportation_fuel" + String(index + 1), g, index)}
           > 
           </Dropdown>   
           <h3>Miles Per Gallon</h3>        
@@ -205,12 +227,13 @@ function Vehicle ({index, removeVehicle, newinputobject, setinputObject, baselin
   )
 }
 
-function Plane ({newinputobject}) {
+function Plane ({newinputobject, defaultObject, setInputNew}) {
 
 
     function changeFlight(param, newval){
-    
+        newinputobject["input_footprint_transportation_airtype"] = 1
         newinputobject[param] = newval
+        setInputNew()
     }
 
 
@@ -220,13 +243,13 @@ function Plane ({newinputobject}) {
         <h2>Flights</h2>
         <form>
           <h3>Short one-way-flights &lt; 400 mi per year</h3>        
-          <input className="text-input" type="number" id="shortfl" name="shortfl" onWheel={(e) => e.target.blur()} onInput={e => changeFlight("input_footprint_transportation_airshort", e.target.value)} />
+          <input className="text-input" type="number" id="shortfl" name="shortfl" onWheel={(e) => e.target.blur()} onInput={e => changeFlight("input_footprint_transportation_airshort", e.target.value)} placeholder={defaultObject["input_footprint_transportation_airshort"]} />
           <h3>Medium one-way flights 400-1500 mi per year</h3>        
-          <input className="text-input" type="number" id="medfl" name="medfl" onWheel={(e) => e.target.blur()} onInput={e => changeFlight("input_footprint_transportation_airmedium", e.target.value)}  />
+          <input className="text-input" type="number" id="medfl" name="medfl" onWheel={(e) => e.target.blur()} onInput={e => changeFlight("input_footprint_transportation_airmedium", e.target.value)} placeholder={defaultObject["input_footprint_transportation_airmedium"]} />
           <h3>Long one-way flights 1500 - 3000 mi per year</h3>        
-          <input className="text-input" type="number" id="longfl" name="longfl" onWheel={(e) => e.target.blur()}  onInput={e => changeFlight("input_footprint_transportation_airlong", e.target.value)} />
+          <input className="text-input" type="number" id="longfl" name="longfl" onWheel={(e) => e.target.blur()}  onInput={e => changeFlight("input_footprint_transportation_airlong", e.target.value)} placeholder={defaultObject["input_footprint_transportation_airlong"]} />
           <h3>Extended one-way flights &gt; 3000 mi per year</h3>        
-          <input className="text-input" type="number" id="extfl" name="extfl"onWheel={(e) => e.target.blur()}  onInput={e => changeFlight("input_footprint_transportation_airextended", e.target.value)} />
+          <input className="text-input" type="number" id="extfl" name="extfl"onWheel={(e) => e.target.blur()}  onInput={e => changeFlight("input_footprint_transportation_airextended", e.target.value)} placeholder={defaultObject["input_footprint_transportation_airextended"]} />
         </form>
       </div>
   )

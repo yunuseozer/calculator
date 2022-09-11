@@ -75,7 +75,7 @@ function Container() {
         input_footprint_transportation_transit: defaultval,
         input_footprint_transportation_commuter: defaultval,
         input_footprint_transportation_intercity: defaultval,
-        input_footprint_transportation_airtype: defaultval,
+        input_footprint_transportation_airtype: 1,
         input_footprint_transportation_airtotal: defaultval,
         input_footprint_transportation_airshort: defaultval,
         input_footprint_transportation_airmedium: defaultval,
@@ -170,14 +170,14 @@ function Container() {
     //Advances to next page
     function nextPage() {
         setPage(page + 1)
-        window.scroll(0,0)
+        //window.scroll(0,0)
         APIgrab()
     }
 
     //Advances to last page
     function prevPage() {
     setPage(page - 1)
-    window.scroll(0,0)
+    //window.scroll(0,0)
     APIgrab()
 
     }
@@ -185,7 +185,7 @@ function Container() {
     //Function used for selecting page from topnavbar of calc.
     function selectPage(pageNum) {
         setPage(pageNum)
-        APIgrab()
+        //APIgrab()
 
     }
 
@@ -226,9 +226,9 @@ function Container() {
      * it tends to keep everything cleaner
      */
         if (Object.keys(baselineObject).length === 0) {  
-          console.log(inputObject)
+          //console.log(inputObject)
             let APICaller = new APILib.GET_DEFAULTS_AND_RESULTS_API();
-            console.log(inputObject['input_size'])
+            //console.log(inputObject['input_size'])
             APICaller.callAPI({
                 input_location_mode: inputObject['input_location_mode'],
                 input_income: inputObject['input_income'],
@@ -236,11 +236,9 @@ function Container() {
                 input_size: inputObject['input_size']
             }).then((returnVal) => {
                 console.log(returnVal)
-                //setresultObject(returnVal)
+                setresultObject(returnVal)
                 setbaselineObject(returnVal)
                 setdefaultObject(returnVal)
-                console.log(defaultObject)
-                console.log(baselineObject)
                 let newinputobject = JSON.parse(JSON.stringify(inputObject))
                 for (const property in returnVal) {
                     if (property in newinputobject){
@@ -251,11 +249,11 @@ function Container() {
                 setinputObject(newinputobject)
             });
         } else if( page !== 0) {
-            console.log(inputObject)
+            //console.log(inputObject)
             let footprintAPICaller = new APILib.COMPUTE_FOOTPRINT_API();
             footprintAPICaller.callAPI(inputObject).then((returnVal) => {
                 console.log(returnVal)
-
+                console.log(inputObject)
                 if (!baseline_ready) {
                   setbaselineObject(returnVal)
                   baseline_ready = true
