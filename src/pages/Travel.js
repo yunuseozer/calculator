@@ -100,7 +100,7 @@ export default Travel;
 function Vehicle ({index, removeVehicle, newinputobject, setInputNew, baseline, defaultObject}) {
   const [gas, setGas] = useState(undefined)
   const [freq, setFreq] = useState(undefined)
-  const [miles, setMiles] = useState(defaultObject["input_footprint_transportation_miles1"])
+  const [miles, setMiles] = useState(newinputobject["input_footprint_transportation_miles" + String(index + 1)])
   const [mpg, setMpg] = useState('')
 
 
@@ -161,20 +161,102 @@ function Vehicle ({index, removeVehicle, newinputobject, setInputNew, baseline, 
   function changeFreq(param, newval) {
     setFreq(newval)
     let curr = newinputobject[param]
-    if (newval == "PER MONTH"){
+    if (newval == "PER MONTH" && freq == "PER YEAR"){
         newinputobject[param] = curr * 12
     }
-    if (newval == "PER WEEK"){
+    if (newval == "PER MONTH" && freq == "PER WEEK"){
+      newinputobject[param] = (curr / 52) * 12
+  }
+    if (newval == "PER YEAR" && freq == "PER MONTH"){
+      newinputobject[param] = curr / 12
+  }
+    if (newval == "PER WEEK" && freq == "PER YEAR"){
         newinputobject[param] = curr * 52
     }
-    if (newval == "PER DAY"){
+    if (newval == "PER DAY" && freq == "PER YEAR"){
         newinputobject[param] = curr * 365
+    }    
+    if (newval == "PER MONTH" && freq == "PER DAY"){
+      newinputobject[param] = (curr / 365) * 12 
     }
+    if (newval == "PER DAY" && freq == "PER MONTH"){
+      newinputobject[param] = (curr / 12) * 365
+  }
+    if (newval == "PER YEAR" && freq == "PER DAY"){
+      newinputobject[param] = curr / 365
+  }
+    if (newval == "PER WEEK" && freq == "PER MONTH"){
+      newinputobject[param] = (curr / 12) * 52
+  }
+    if (newval == "PER YEAR" && freq == "PER WEEK"){
+      newinputobject[param] = curr / 52
+  }
+    if (newval == "PER DAY" && freq == "PER WEEK"){
+      newinputobject[param] = (curr / 52) * 365
+  }
+    if (newval == "PER WEEK" && freq == "PER DAY"){
+      newinputobject[param] = (curr / 365) * 52
+    }
+    setFreq(newval)
+    setInputNew()
+
   }
 
+  if (gas == "GAS") {
 
-
-  return (
+    return (
+        <div className="vehicle-box">
+          <div className="vehicle-delete-button"  onClick={()=>removeVehicle(index)}>
+            <img alt = "" src={trashicon} className="trashicon" />
+          </div>
+          <h2>Vehicle {index + 1}</h2>
+            <h3>Fuel Type</h3> 
+            <Dropdown 
+            placeholder={"GAS"} 
+            options={["GAS", "ELECTRIC"]}
+            value={gas}
+            onChange={g => changeType("input_footprint_transportation_fuel" + String(index + 1), g, index)}
+            > 
+            </Dropdown>   
+            <h3>Miles Per Gallon</h3>        
+            <input 
+              className="text-input" 
+              type="number" 
+              id="mpg" 
+              onWheel={(e) => e.target.blur()}
+              placeholder={mpg_default}
+              name="mpg"
+              value={mpg}
+              onChange={e => changeMPG("input_footprint_transportation_mpg" + String(index + 1), e.target.value)}
+              />
+            <div className="row-wrapper input-row">
+              <div className="half-width">
+                <h3>Miles Driven</h3>        
+                <input 
+                className="text-input" 
+                type="number" 
+                id="md" 
+                onWheel={(e) => e.target.blur()}
+                placeholder={miles_default}
+                name="md"
+                onChange={e => changeMiles("input_footprint_transportation_miles" + String(index + 1), e.target.value)}
+                />
+              </div>
+              <div className="half-width">
+                <h3>Frequency</h3>        
+                <Dropdown 
+                placeholder={"PER YEAR"} 
+                options={["PER YEAR", "PER MONTH", "PER WEEK", "PER DAY"]}
+                value={freq}
+                onChange={f => changeFreq("input_footprint_transportation_miles" + String(index + 1), f)}
+                ></Dropdown>       
+              </div>
+            </div>
+        </div>
+    )
+  }
+  else {
+    return (
       <div className="vehicle-box">
         <div className="vehicle-delete-button"  onClick={()=>removeVehicle(index)}>
           <img alt = "" src={trashicon} className="trashicon" />
@@ -189,27 +271,27 @@ function Vehicle ({index, removeVehicle, newinputobject, setInputNew, baseline, 
           > 
           </Dropdown>   
           <h3>Miles Per Gallon</h3>        
-          <input 
-            className="text-input" 
-            type="number" 
-            id="mpg" 
-            onWheel={(e) => e.target.blur()}
-            placeholder={mpg_default}
-            name="mpg"
-            value={mpg}
-            onChange={e => changeMPG("input_footprint_transportation_mpg" + String(index + 1), e.target.value)}
-            />
+            <input 
+              className="text-input" 
+              type="number" 
+              id="mpg" 
+              onWheel={(e) => e.target.blur()}
+              placeholder={mpg_default}
+              name="mpg"
+              value={mpg}
+              onChange={e => changeMPG("input_footprint_transportation_mpg" + String(index + 1), e.target.value)}
+              />
+      
           <div className="row-wrapper input-row">
             <div className="half-width">
               <h3>Miles Driven</h3>        
               <input 
               className="text-input" 
               type="number" 
+              id="md" 
               onWheel={(e) => e.target.blur()}
               placeholder={miles_default}
-              id="md" 
               name="md"
-              value={miles}
               onChange={e => changeMiles("input_footprint_transportation_miles" + String(index + 1), e.target.value)}
               />
             </div>
@@ -225,6 +307,7 @@ function Vehicle ({index, removeVehicle, newinputobject, setInputNew, baseline, 
           </div>
       </div>
   )
+  }
 }
 
 function Plane ({newinputobject, defaultObject, setInputNew}) {

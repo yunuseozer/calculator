@@ -41,8 +41,8 @@ const CarbCacl = ({APIgrab, page, prevPage, nextPage, selectPage, toggleGraph, s
     const pages = [
     <Start APIgrab={APIgrab} nextPage={nextPage} setinputObject={setinputObject} input={input}></Start>,
     <Travel APIgrab={APIgrab} setinputObject={setinputObject} input={input} baseline={baseline} defaultObject={defaultObject}></Travel>, 
-    <Home setinputObject={setinputObject} input={input} APIgrab={APIgrab} defaultObject={defaultObject}></Home>, 
-    <Food APIgrab={APIgrab} setinputObject={setinputObject} input={input}></Food>, 
+    <Home setinputObject={setinputObject} input={input} APIgrab={APIgrab} defaultObject={defaultObject} baseline={baseline}></Home>, 
+    <Food APIgrab={APIgrab} setinputObject={setinputObject} input={input} defaultObject={defaultObject}></Food>, 
     <Shopping setinputObject={setinputObject} input={input}></Shopping>, 
     <Results baseline={baseline} results={results} ></Results>
     ]

@@ -1,18 +1,24 @@
 import Switch from '../customAssets/Switch'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Dropdown from '../customAssets/Dropdown';
 import Tooltip from '../customAssets/Tooltip';
 import _ from "lodash";
 
 
+// <h2> What percentage was purcahsed through a clean energy program? </h2>
+//<div className="row-wrapper">
+//<div className="left-home-input">
+//  <p>Percentage</p>
+ // <input className="text-input" placeholder = "0" type="number" id="fname" name="fname"  onChange={e => changeCleanPercent(e.target.value)} onWheel={(e) => e.target.blur()}/>
+//</div>
+//</div>*/
 
-
-const Home = ({setinputObject, input, APIgrab, defaultObject}) => {
+const Home = ({setinputObject, input, APIgrab, defaultObject, baseline}) => {
 
 
   const [animation, setAnimation] = useState("animation");
   const [homeToggle, setHomeToggle] = useState(true)
-
+  const [yscroll, setYscroll] = useState(0);
   const [newinputobject, setnewinputobject] = useState({...input}); 
 
 
@@ -39,11 +45,14 @@ const Home = ({setinputObject, input, APIgrab, defaultObject}) => {
       setAnimation("animation-2")
     }, delayInMilliseconds);    }
  , [animation]);
+ useLayoutEffect(() => {
+  window.scrollTo(0, yscroll);
+});
 
 
  function setInputNew() {
     setinputObject(newinputobject);
-    //setYscroll(window.scrollY)
+    setYscroll(window.scrollY)
     APIgrab()
 }
 
@@ -52,7 +61,7 @@ const Home = ({setinputObject, input, APIgrab, defaultObject}) => {
         <div style={{display:'flex', justifyContent:'center', width:'100%', height:'120px'}}>
          <Switch toggler={setHomeToggle} toggle={homeToggle}></Switch>  
          </div>
-         {homeToggle ? <HomeSimple setinputObject={setinputObject} newinputobject={newinputobject} setInputNew={setInputNew} defaultObject={defaultObject}></HomeSimple> : <HomeAdvanced setinputObject={setinputObject} newinputobject={newinputobject}></HomeAdvanced>}     
+         {homeToggle ? <HomeSimple setinputObject={setinputObject} newinputobject={newinputobject} setInputNew={setInputNew} defaultObject={defaultObject} baseline={baseline}></HomeSimple> : <HomeAdvanced setinputObject={setinputObject} newinputobject={newinputobject} baseline={baseline} defaultObject={defaultObject} setInputNew={setInputNew}></HomeAdvanced>}     
        </div>
     );
 }
@@ -62,47 +71,106 @@ export default Home;
 
 
 
-function HomeSimple({setinputObject, newinputobject, setInputNew, defaultObject}) {
+function HomeSimple({setinputObject, newinputobject, setInputNew, defaultObject, baseline}) {
 
   const [freq1, setfreq1] = useState("$/YEAR")
   const [water1, setWater1] = useState("")
+  const [elec1, setElec1] = useState(defaultObject["input_footprint_housing_electricity_dollars"])
   
   function changeElec(newval) {
-    if (freq1 !== "$/YEAR" && typeof freq1 !== ''){
-      newinputobject['input_footprint_housing_electricity_dollars'] = newval * freq1
-      console.log(0)
-    } else {
-      newinputobject['input_footprint_housing_electricity_dollars'] = newval 
-      console.log(1)
+    console.log(1)
+    
+    if (freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = newval
+    } else if (freq1 == "$/MONTH") {
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = newval
+    } else if (freq1 == "kWh/YEAR") {
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = newval
+    } else if (freq1 == "kWh/MONTH") {
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = newval
+    } 
+    if (newval == "") {
+      newinputobject['input_footprint_housing_electricity_dollars'] = elec1
     }
     console.log(freq1)
     setInputNew()
   }
 
   function changeSpace(newval) {
+    console.log(2)
+
     newinputobject['input_footprint_housing_squarefeet'] = newval
+    if (newval == "") {
+      newinputobject['input_footprint_housing_squarefeet'] = defaultObject['input_footprint_housing_squarefeet']
+    }
     setInputNew()
   }
 
   function changeWater(newval) {
+    console.log(3)
+
     setWater1(newval)
     newinputobject['input_footprint_housing_watersewage'] = newval
     setInputNew()
   }
 
   function changeFreq(newval) {
-    setfreq1(newval)
-    console.log(newval)
+
+    console.log(4)
     let curr = newinputobject['input_footprint_housing_electricity_dollars']
-    if (newval == "$/MONTH"){
-        newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
+    if (newval == "$/MONTH" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
     }
-    if (newval == "$/WEEK"){
-        newinputobject['input_footprint_housing_electricity_dollars'] = curr * 52
+    if (newval == "$/YEAR" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr / 12
     }
-    if (newval == "PER DAY"){
-        newinputobject['input_footprint_housing_electricity_dollars'] = curr * 365
+    if (newval == "kWh/YEAR" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr / 12    
     }
+    if (newval == "kWh/MONTH" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr * 12 
+    }
+    if (newval == "kWh/YEAR" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr 
+    }
+    if (newval == "$/YEAR" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr 
+    }
+    if (newval == "kWh/MONTH" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr * 12
+    }
+    if (newval == "$/YEAR" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr / 12
+    }
+    if (newval == "kWh/MONTH" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr 
+    }
+    if (newval == "$/MONTH" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr 
+    }
+    if (newval == "kWh/YEAR" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr / 12
+    }
+    if (newval == "$/MONTH" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
+    }
+    setfreq1(newval)
     setInputNew()
   }
 
@@ -119,13 +187,13 @@ function HomeSimple({setinputObject, newinputobject, setInputNew, defaultObject}
       <div className="row-wrapper">
         <div className="left-home-input">
           <p>Amount</p>
-          <input className="text-input" placeholder = {defaultObject["input_footprint_housing_electricity_dollars"]} type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
+          <input className="text-input"  placeholder = {defaultObject["input_footprint_housing_electricity_dollars"]} type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
         </div>
         <div className="right-home-input">
           <p>Frequency</p>
           <Dropdown
             placeholder={"$/YEAR"} 
-            options={["$/YEAR", "$/MONTH", "$/WEEK"]}
+            options={["$/YEAR", "$/MONTH", "kWh/YEAR", "kWh/MONTH"]}
             value={freq1}
             onChange={u => changeFreq(u)}>
           </Dropdown>
@@ -169,32 +237,122 @@ function HomeSimple({setinputObject, newinputobject, setInputNew, defaultObject}
 }
 
 
-function HomeAdvanced({setinputObject, newinputobject}) {
+function HomeAdvanced({setinputObject, newinputobject, defaultObject, setInputNew}) {
 
 
   const [freq2_1, setFreq2_1] = useState("")
-  const [freq2_2, setFreq2_2] = useState("")
+  const [freq2_2, setFreq2_2] = useState("$/YEAR")
   const [freq2_3, setFreq2_3] = useState("")
   const [water2, setWater2] = useState("")
-
-
+  const [freq1, setfreq1] = useState("$/YEAR")
+  const [water1, setWater1] = useState("")
+  const [elec1, setElec1] = useState(defaultObject["input_footprint_housing_electricity_dollars"])
+  
   function changeElec(newval) {
-    if (freq2_1 !== "PER YEAR" && typeof freq2_1 !== ''){
-      newinputobject['input_footprint_housing_electricity_dollars'] = newval * freq2_1
-    } else {
-      newinputobject['input_footprint_housing_electricity_dollars'] = newval 
+    console.log(1)
+    
+    if (freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = newval
+    } else if (freq1 == "$/MONTH") {
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = newval
+    } else if (freq1 == "kWh/YEAR") {
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = newval
+    } else if (freq1 == "kWh/MONTH") {
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = newval
+    } 
+    if (newval == "") {
+      newinputobject['input_footprint_housing_electricity_dollars'] = elec1
     }
+    console.log(freq1)
+    setInputNew()
+  }
+  function changeFreq(newval) {
+    console.log(2)
+    let curr = newinputobject['input_footprint_housing_electricity_dollars']
+    if (newval == "$/MONTH" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
+    }
+    if (newval == "$/YEAR" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr / 12
+    }
+    if (newval == "kWh/YEAR" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr / 12    
+    }
+    if (newval == "kWh/MONTH" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr * 12 
+    }
+    if (newval == "kWh/YEAR" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr 
+    }
+    if (newval == "$/YEAR" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr 
+    }
+    if (newval == "kWh/MONTH" && freq1 == "$/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr * 12
+    }
+    if (newval == "$/YEAR" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr / 12
+    }
+    if (newval == "kWh/MONTH" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr 
+    }
+    if (newval == "$/MONTH" && freq1 == "kWh/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr 
+    }
+    if (newval == "kWh/YEAR" && freq1 == "$/MONTH"){
+      newinputobject['input_footprint_housing_electricity_type'] = 1
+      newinputobject['input_footprint_housing_electricity_kwh'] = curr / 12
+    }
+    if (newval == "$/MONTH" && freq1 == "kWh/YEAR"){
+      newinputobject['input_footprint_housing_electricity_type'] = 0
+      newinputobject['input_footprint_housing_electricity_dollars'] = curr * 12
+    }
+    setfreq1(newval)
+    setInputNew()
   }
 
   function changeNatGas(newval) {
-    if (freq2_2 !== "PER YEAR" && typeof freq2_2 !== ''){
-      newinputobject['input_footprint_housing_naturalgas_dollars'] = newval * freq2_2
-    } else {
-      newinputobject['input_footprint_housing_naturalgas_dollars'] = newval 
+    console.log(3)
+
+    if (freq2_2 == "$/YEAR"){
+      newinputobject['input_footprint_housing_naturalgas_type'] = 0
+      newinputobject['input_footprint_housing_naturalgas_dollars'] = newval
+
+    } else if (freq2_2 == "$/MONTH") {
+      newinputobject['input_footprint_housing_naturalgas_type'] = 0
+      newinputobject['input_footprint_housing_naturalgas_dollars'] = newval
+
+    } else if (freq2_2 == "ft^3/YEAR") {
+      newinputobject['input_footprint_housing_naturalgas_type'] = 2
+      newinputobject['input_footprint_housing_naturalgas_cuft'] = newval
+    } else if (freq2_2 == "ft^3/MONTH") {
+      newinputobject['input_footprint_housing_naturalgas_type'] = 2
+      newinputobject['input_footprint_housing_naturalgas_cuft'] = newval
+    } 
+    if (newval == "") {
+      console.log(defaultObject["input_footprint_housing_naturalgas_dollars"])
+      newinputobject['input_footprint_housing_electricity_dollars'] = defaultObject["input_footprint_housing_naturalgas_dollars"]
     }
+    setInputNew()
   }
 
   function changeNatOther(newval) {
+    console.log(4)
+
     if (freq2_3 !== "PER YEAR" && typeof freq2_3 !== ''){
       newinputobject['input_footprint_housing_heatingoil_dollars'] = newval * freq2_3
     } else {
@@ -203,6 +361,8 @@ function HomeAdvanced({setinputObject, newinputobject}) {
   }
 
   function changeSpace(newval) {
+    console.log(5)
+
     newinputobject['input_footprint_housing_squarefeet'] = newval
   }
 
@@ -211,11 +371,15 @@ function HomeAdvanced({setinputObject, newinputobject}) {
   }
 
   function changeWater(newval) {
+    console.log(6)
+
     setWater2(newval)
     newinputobject['input_footprint_housing_watersewage'] = newval
   }
 
   function changeFreq2_1(newval) {
+    console.log(7)
+
     setFreq2_1(newval)
     let curr = newinputobject['input_footprint_housing_electricity_dollars']
     if (newval == "PER MONTH"){
@@ -230,6 +394,8 @@ function HomeAdvanced({setinputObject, newinputobject}) {
   }
 
   function changeFreq2_2(newval) {
+    console.log(8)
+
     setFreq2_2(newval)
     let curr = newinputobject['input_footprint_housing_naturalgas_dollars']
     if (newval == "PER MONTH"){
@@ -244,6 +410,8 @@ function HomeAdvanced({setinputObject, newinputobject}) {
   }
 
   function changeFreq2_3(newval) {
+    console.log(9)
+
     setFreq2_3(newval)
     let curr = newinputobject['input_footprint_housing_heatingoil_dollars']
     if (newval == "PER MONTH"){
@@ -260,38 +428,31 @@ function HomeAdvanced({setinputObject, newinputobject}) {
   return (
   <div>
     <div className="outer-question">
+      <div className="row-wrapper">
       <div className='tooltip-row'>
         <h2>How much do you spend on electricity?</h2>
         <Tooltip text={"To calculate your total electricity usage or costs, review your monthly electricity bills. Each bill will tell you how many kilowatt hours you have used in the month at what cost."}></Tooltip>
-      </div>      
+      </div>
+      </div>
       <div className="row-wrapper">
         <div className="left-home-input">
           <p>Amount</p>
-          <input className="text-input" placeholder = "1070" type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
+          <input className="text-input"  placeholder = {defaultObject["input_footprint_housing_electricity_dollars"]} type="number" id="fname" name="fname" onChange={e => changeElec(e.target.value)} onWheel={(e) => e.target.blur()}/>
         </div>
         <div className="right-home-input">
           <p>Frequency</p>
           <Dropdown
             placeholder={"$/YEAR"} 
-            options={["$/YEAR", "$/MONTH", "$/WEEK", "$/DAY"]}
-            value={freq2_1}
-            onChange={w => changeFreq2_1(w)}
-            >
+            options={["$/YEAR", "$/MONTH", "kWh/YEAR", "kWh/MONTH"]}
+            value={freq1}
+            onChange={u => changeFreq(u)}>
           </Dropdown>
         </div>
       </div>
     </div>
     <hr style={{width:"100%", marginBottom:"2rem"}}></hr>  
     <div className="outer-question">
-      <h2> What percentage was purcahsed through a clean energy program? </h2>
-      <div className="row-wrapper">
-        <div className="left-home-input">
-          <p>Percentage</p>
-          <input className="text-input" placeholder = "0" type="number" id="fname" name="fname"  onChange={e => changeCleanPercent(e.target.value)} onWheel={(e) => e.target.blur()}/>
-        </div>
-      </div>
-      
-    <hr style={{width:"100%", marginBottom:"2rem"}}></hr>
+     
 
     <div className="outer-question">
       <div className='tooltip-row'>
@@ -301,13 +462,13 @@ function HomeAdvanced({setinputObject, newinputobject}) {
       <div className="row-wrapper">
         <div className="left-home-input">
           <p>Amount</p>
-          <input className="text-input" placeholder = "550" type="number" id="fname" name="fname" onChange={e => changeNatGas(e.target.value)} onWheel={(e) => e.target.blur()}/>
+          <input className="text-input" placeholder = "0" type= "number" id="fname" name="fname" onChange={e => changeNatGas(e.target.value)} onWheel={(e) => e.target.blur()}/>
         </div>
         <div className="right-home-input">
           <p>Unit</p>
           <Dropdown
             placeholder={"$/YEAR"} 
-            options={["$/YEAR", "$/MONTH", "$/WEEK", "$/DAY"]}
+            options={["$/YEAR", "$/MONTH", "ft^3/YEAR", "ft^3/MONTH"]}
             value={freq2_2}
             onChange={w => changeFreq2_2(w)}
             >

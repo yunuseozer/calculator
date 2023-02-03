@@ -25,7 +25,7 @@ const Slider = ({unit, avg, title, setval, val, onChange}) => {
   //////////////////////////////////////////
 
 
-    const [value, setValue] = useState("0");  //Default slider value is average
+    const [value, setValue] = useState(val);  //Default slider value is average
 
     function handleChange(event) {
         setValue(event.target.value)

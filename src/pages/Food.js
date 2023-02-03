@@ -4,14 +4,14 @@ import Tooltip from '../customAssets/Tooltip';
 import _ from "lodash";
 
 
-const Food = ({APIgrab, setinputObject, input}) => {
+const Food = ({APIgrab, setinputObject, input, defaultObject}) => {
 
   
   const [animation, setAnimation] = useState("animation");
   const [dairy, setDairy] = useState(0);
   const [r, setR] = useState(0);
-  const [meat, setMeat] = useState(0);
-  const [fish, setFish] = useState(0);
+  const [meat, setMeat] = useState(defaultObject["input_footprint_shopping_food_meat_beefpork"] * (0.9 / 494));
+  const [fish, setFish] = useState(defaultObject["input_footprint_shopping_food_meat_fish"] * (0.3 / 182.5));
   const [other, setOther] = useState(0);
   const [poultry, setPoultry] = useState(0);
   const [grains, setGrains] = useState(0);
@@ -19,7 +19,7 @@ const Food = ({APIgrab, setinputObject, input}) => {
   const [fruits, setFruits] = useState(0);
   const [drinks, setDrinks] = useState(0);
   const [newinputobject, setnewinputobject] = useState({...input}); 
-  //console.log(newinputobject)
+  console.log(input["input_footprint_shopping_food_poultry_default"])
 
   useEffect(() => {
     return () => _.isEqual(input, newinputobject) ? null : setinputObject(newinputobject)
@@ -41,17 +41,25 @@ const Food = ({APIgrab, setinputObject, input}) => {
 
     
 
+  function changeMeat(param, newval) {
+    newinputobject[param] = newval * (494 / 0.9)
+    newinputobject["input_changed"] = 1
+    newinputobject["input_footprint_shopping_food_meattype"] = 1
     
+    setinputObject(newinputobject)
+    setYscroll(window.scrollY)
+    APIgrab()
+}
 
-    function changeMeat(param, newval) {
-        newinputobject[param] = Math.round(newval * (494 / 0.9))
-        newinputobject["input_changed"] = 1
-        newinputobject["input_footprint_shopping_food_meattype"] = 1
-        
-        setinputObject(newinputobject)
-        setYscroll(window.scrollY)
-        APIgrab()
-    }
+  function changeFish(param, newval) {
+      newinputobject[param] = newval * (182.5 * 0.3)
+      newinputobject["input_changed"] = 1
+      newinputobject["input_footprint_shopping_food_meattype"] = 1
+      
+      setinputObject(newinputobject)
+      setYscroll(window.scrollY)
+      APIgrab()
+  }
 
       return (
         <div className="travel-wrapper" id = {animation}>
@@ -65,7 +73,7 @@ const Food = ({APIgrab, setinputObject, input}) => {
             avg={0.9}
             title={"BEEF, PORK, LAMB, VEAL"}
             setval={setMeat}
-            val = {Math.round(meat)}
+            val = {Math.round(meat * 10) / 10}
             onChange = {m => changeMeat("input_footprint_shopping_food_meat_beefpork", m)}
           ></Slider>
           <hr></hr>
@@ -74,7 +82,8 @@ const Food = ({APIgrab, setinputObject, input}) => {
             avg={0.3}
             title={"FISH AND SEAFOOD"}
             setval={setFish}
-            val = {fish}
+            val = {Math.round(fish * 10) / 10}
+            onChange = {m => changeFish("input_footprint_shopping_food_meat_fish", m)}
           ></Slider>
           <hr></hr>
           <Slider
